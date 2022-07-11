@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next",
     "start": "next start",
-    "build": "next build"
+    "build": "next build",
+    "format": "prettier --config .prettierrc.js --write ."
   },
   "author": "Shu Ding",
   "license": "MIT",
@@ -18,10 +19,6 @@
     "react-dom": "^17.0.1"
   },
   "devDependencies": {
-    "prettier": "^2.0.5"
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
+    "prettier": "^2.7.1"
   }
 }
