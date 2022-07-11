@@ -1,22 +1,30 @@
-# [Nextra](https://nextra.vercel.app)
+# [Cairo by Example](https://cairo-by-example.org)
 
-_Warning: this project is not production ready, API might change without notice._
+Learn Cairo and StarkNet Smart Contract programming with example code.
 
-[![](https://vercel.com/button)](https://vercel.com/import/git?s=https%3A%2F%2Fgithub.com%2Fshuding%2Fnextra&c=1)
+## Setup
 
-**Nextra** is a [Next.js](https://nextjs.org) and [MDX](https://mdxjs.com) powered, no-code site generator.
+1. `git clone <url>`
+2. `pnpm install`
+3. `cp .env.example .env.local`
+4. `cp .env.example .env.production`
+5. Update `.env` files
+6. `pnpm run dev`
 
-![](/public/demo.png)
+## Useful Commands
 
-## Development
+```sh
+pnpm install
 
-The code of Nextra is under the [`core`](https://github.com/shuding/nextra/tree/core) branch.
+pnpm run dev
 
-## Themes
+pnpm run build
 
-- [nextra-theme-docs](https://github.com/vercel/swr-site) ([demo](https://swr.vercel.app))
-- [nextra-theme-blog](https://github.com/shuding/site) ([demo](https://shud.in))
+pnpm run start
 
----
+pnpm run lint
 
-Created by [@shuding](https://github.com/shuding) and [@pacocoursey](https://github.com/pacocoursey) at [Vercel](https://vercel.com). Released under the MIT license.
+pnpm run format
+
+pnpx vercel [--prod] [--force]
+```
