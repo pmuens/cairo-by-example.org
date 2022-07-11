@@ -1,7 +1,7 @@
 {
-  "name": "nextra",
+  "name": "cairo-by-example",
   "version": "1.0.0",
-  "description": "",
+  "description": "Learn Cairo and StarkNet Smart Contract programming with example code.",
   "main": "index.js",
   "scripts": {
     "dev": "next",
@@ -10,7 +10,7 @@
     "lint": "next lint --cache -c .eslintrc.js --fix .",
     "format": "prettier --config .prettierrc.js --write ."
   },
-  "author": "Shu Ding",
+  "author": "Philipp Muens",
   "license": "MIT",
   "dependencies": {
     "next": "^12.1.0",
