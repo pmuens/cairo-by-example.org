@@ -14,11 +14,11 @@ export const getStaticProps = ({ params }) => {
         // We add an `ssg` field to the page props,
         // which will be provided to the Nextra `useSSG` hook.
         ssg: {
-          stars: repo.stargazers_count,
-        },
+          stars: repo.stargazers_count
+        }
       },
       // The page will be considered as stale and regenerated every 60 seconds.
-      revalidate: 60,
+      revalidate: 60
     }))
 }
 
