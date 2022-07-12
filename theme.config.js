@@ -1,13 +1,12 @@
+/* eslint-disable import/no-anonymous-default-export */
+
 export default {
-  github: 'https://github.com/shuding/nextra',
-  docsRepositoryBase: 'https://github.com/shuding/nextra/blob/master',
-  titleSuffix: ' – Nextra',
+  github: 'https://github.com/pmuens/cairo-by-example.org',
+  docsRepositoryBase: 'https://github.com/pmuens/cairo-by-example.org/blob/master',
+  titleSuffix: ' – Cairo by Example',
   logo: (
     <>
-      <span className="mr-2 font-extrabold hidden md:inline">Nextra</span>
-      <span className="text-gray-600 font-normal hidden md:inline">
-        The Next.js Static Site Generator
-      </span>
+      <span className="mr-2 font-extrabold hidden md:inline">Cairo by Example</span>
     </>
   ),
   head: (
@@ -16,15 +15,24 @@ export default {
       <meta name="theme-color" content="#ffffff" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta httpEquiv="Content-Language" content="en" />
-      <meta name="description" content="Nextra: the Next.js site builder" />
-      <meta name="og:description" content="Nextra: the Next.js site builder" />
+      <meta
+        name="description"
+        content="Cairo by Example: Learn Cairo and StarkNet Smart Contract programming with example code."
+      />
+      <meta
+        name="og:description"
+        content="Cairo by Example: Learn Cairo and StarkNet Smart Contract programming with example code."
+      />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:image" content="https://nextra.vercel.app/og.png" />
-      <meta name="twitter:site:domain" content="nextra.vercel.app" />
-      <meta name="twitter:url" content="https://nextra.vercel.app" />
-      <meta name="og:title" content="Nextra: Next.js static site generator" />
-      <meta name="og:image" content="https://nextra.vercel.app/og.png" />
-      <meta name="apple-mobile-web-app-title" content="Nextra" />
+      <meta name="twitter:image" content="https://cairo-by-example.org/og.png" />
+      <meta name="twitter:site:domain" content="https://cairo-by-example.org" />
+      <meta name="twitter:url" content="https://cairo-by-example.org" />
+      <meta
+        name="og:title"
+        content="Cairo by Example: Learn Cairo and StarkNet Smart Contract programming"
+      />
+      <meta name="og:image" content="https://cairo-by-example.org" />
+      <meta name="apple-mobile-web-app-title" content="Cairo by Example" />
       <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
       <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -38,6 +46,6 @@ export default {
   nextLinks: true,
   footer: true,
   footerEditLink: 'Edit this page on GitHub',
-  footerText: <>MIT {new Date().getFullYear()} © Nextra.</>,
+  footerText: <>MIT {new Date().getFullYear()} © Philipp Muens.</>,
   unstable_faviconGlyph: '👋'
 }
