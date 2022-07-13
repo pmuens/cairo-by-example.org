@@ -1,0 +1,71 @@
+# Arrays
+
+Cairo supports Arrays which store their elements in Memory Segments. They are implemented as a continuous list of `felt` values in memory.
+
+Memory for an Array is allocated via `alloc`. Iterating over Arrays is done via recursion. Arrays are 0-indexed and individual elements can be accessed via their index.
+
+When using Arrays as function arguments it's a convention to pass-in the length of the Array first, followed by the Array itself. The same convention holds when using Arrays in function return values.
+
+The argument name of the Array length should be `<array-name>_len`.
+
+## Example
+
+```cairo
+from starkware.cairo.common.alloc import alloc
+
+func contains(array_len : felt, array : felt*, needle : felt) -> (result : felt):
+    # If we haven't found the element yet and we're at the end of the array
+    #   we can conclude that it's not contained in the array.
+    if array_len == 0:
+        return (0)
+    end
+
+    # If the element ot be found is at the current array's position
+    #   we've found the element and can return early.
+    if array[0] == needle:
+        return (1)
+    end
+
+    # Using recursion to continue iterating over the array.
+    return contains(array_len - 1, array + 1, needle)
+end
+
+func parrot(array_len : felt, array : felt*) -> (array_len : felt, array : felt*):
+    # Pass-through the Array length and the Array itself.
+    return (array_len, array)
+end
+
+func main():
+    alloc_locals
+
+    # Allocate memory and get a pointer to the start of the memory.
+    let (array : felt*) = alloc()
+
+    # Array value can be set by using the pointer to memory and an offset.
+    assert [array] = 1
+    assert [array + 1] = 2
+    assert [array + 2] = 3
+    assert [array + 3] = 4
+    assert [array + 4] = 5
+
+    # Accessing a value via an index.
+    let value = array[2]
+    assert value = 3
+
+    # Calling a function with an Array as a parameter.
+    # Note that the parameter before the Array is the Array length.
+    let (result) = contains(5, array, 5)
+    assert result = 1
+    let (result) = contains(5, array, 10)
+    assert result = 0
+
+    # Getting an Array as a return value.
+    # Note that the return value before the actual Array is its length.
+    let (length, arr) = parrot(5, array)
+    assert length = 5
+    assert arr[0] = 1
+    assert arr[4] = 5
+
+    return ()
+end
+```
