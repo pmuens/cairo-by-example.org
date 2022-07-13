@@ -1,0 +1,68 @@
+# Variables
+
+Variables in Cairo can be aliased or evaluated. There are 4 different types of variables:
+
+1. `let`: References
+   - Can be revoked
+   - Can be redefined
+   - Can be value references (e.g. `let foo = 42`)
+   - Can be expression references (e.g. `let bar = foo`)
+2. `tempvar`: Temporary Variables
+   - Can be revoked (because they rely on `ap`)
+   - Can be redefined
+   - Based on `ap` register
+   - Auto-increment the `ap` register
+3. `const`: Constants
+   - Cannot be revoked
+   - Cannot be redefined
+   - Only integers
+   - Simple replacement by the Cairo compiler (not translated into a Cairo instruction)
+4. `local`: Local Variables
+   - Cannot be revoked
+   - Can be redefined
+   - Based on `fp` register
+   - Do not auto-increment the `ap` register
+
+## Example
+
+````cairo
+# Constants can be defined at the top level to be accessible by all functions.
+const meaning_of_life = 42
+
+func main():
+    # `alloc_locals` is required to use Local Variables.
+    # `alloc_locals` is translated to `ap += SIZEOF_LOCALS` behind the scenes.
+    alloc_locals
+
+    # References
+    let reference = 42
+    let reference = 43
+
+    # Temporary Variables
+    # The following code is equivalent to:
+    #   ```
+    #   [ap] = 42; ap++
+    #   let tmp = [ap - 1]
+    #   ```
+    tempvar tmp = 42
+    tempvar tmp = 43
+
+    # Constants
+    const constant = 42
+    # `const` variables cannot be redefined.
+    # const constant = 43
+
+    # Local Variables
+    # The following code is equivalent to:
+    #   ```
+    #   [fp + 0] = 42
+    #   [fp + 1] = 43
+    #   ```
+    local x = 42
+    local y = 43
+
+    local x = 43
+
+    return ()
+end
+````
