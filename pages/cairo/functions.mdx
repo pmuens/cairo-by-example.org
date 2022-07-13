@@ -1,0 +1,120 @@
+# Functions
+
+A function is a reusable unit of code that can get values passed-in (arguments) and returns a value.
+
+In Cairo, a function always has to return a value (use `return ()` to return "Nothing").
+
+Upon function execution the Frame Pointer `fp` will be initialized to the current value of the Allocation Pointer `ap`. The Frame Pointer (`fp`) stays constant (excluding inner function calls) throughout the function's scope which starts at `:` and ends with the `end` keyword.
+
+Given that the Allocation Pointer (`ap`) can be changed in an unpredictable way (e.g. via nested functions calls), `fp` acts as an anchor to ensure that the original function's local variable and argument addresses remain stable and accessible.
+
+A function can be called in 2 ways:
+
+1. `call function_name`
+2. `function_name()`
+
+## Example
+
+```cairo
+from starkware.cairo.common.registers import get_ap
+from starkware.cairo.common.registers import get_fp_and_pc
+
+func accessing_registers():
+    alloc_locals
+
+    # Accessing values of registers
+    let ap_result = get_ap()
+    tempvar ap_value = ap_result.ap_val
+
+    let fp_and_pc_result = get_fp_and_pc()
+    tempvar fp_value = fp_and_pc_result.fp_val
+    tempvar pc_value = fp_and_pc_result.pc_val
+
+    # Using `fp` in a compound expression requires the existence
+    #   of the `__fp__` variable which should contain the value of `fp`.
+    # This is only required if no dereferences are used.
+    let fp_and_pc = get_fp_and_pc()
+    local __fp__ : felt* = fp_and_pc.fp_val
+    tempvar a = fp  # `__fp__` is required
+    tempvar b = [fp]  # `__fp__` is not required
+
+    return ()
+end
+
+func add_with_registers(num_1 : felt, num_2 : felt) -> (result : felt):
+    # The `call` instructions which causes a function to be called
+    #   pushes 2 more values onto the stack (the next Program Counter `pc`
+    #   and the current Frame Pointer `fp`).
+
+    # Functions arguments are accessible at `[fp - 3]`, `[fp - 4]`, ... , `[fp - n]` respectively.
+    # Return values are pushed onto the stack right before the function exits via `ret`.
+
+    # The following code is equivalent to `return (result=num_1 + num_2)`.
+    [ap] = [fp - 3] + [fp - 4]; ap++
+    ret
+end
+
+# This code is equivalent to the implementation of `add_with_registers` above.
+func add_without_registers(num_1 : felt, num_2 : felt) -> (result : felt):
+    let result = num_1 + num_2
+    return (result=result)
+end
+
+# Given that `felt` is the default type one can omit the type declarations.
+func no_types(number) -> (number):
+    return (number)
+end
+
+func multiple_return_values() -> (value_1 : felt, value_2 : felt):
+    # Functions can return multiple values via Tuples.
+    return (value_1=42, value_2=43)
+end
+
+func main():
+    # We have to use `alloc_local` because we're using local variables.
+    alloc_locals
+
+    # Function arguments should be written to the stack before the `call` instruction.
+    # Here we push the value `1` and `2` onto the stack before we call the `add` function.
+    # The following code is equivalent to `add(1, 2)`.
+    [ap] = 1; ap++
+    [ap] = 2; ap++
+    call add_with_registers
+
+    # The return value of a function execution is pushed to the stack before the
+    #   function returns. The `ap` is increment automatically.
+    #   We can therefore access the return value via `[ap - 1]`.
+    # Multiple return values can be accessed via `[ap - 1]`, [ap - 2], ... , `[ap - n]` respectively.
+    assert [ap - 1] = 3
+
+    # If you want to ensure that you call a function with all its
+    #   required arguments you can use the following pattern to
+    #   explicitly name all your arguments.
+    let args = cast(ap, add_with_registers.Args*)
+    args.num_1 = 1; ap++
+    args.num_2 = 2; ap++
+    static_assert args + add_with_registers.Args.SIZE == ap  # Ensure that `ap` was increment correctly.
+    let addition = call add_with_registers
+    assert addition.result = 3
+
+    # We can also name the arguments explicitly in the function call.
+    let (local result) = no_types(number=1)
+    assert result = 1
+
+    # The following function execution is equivalent to the version with register usage described above.
+    let (local sum) = add_without_registers(1, 2)
+    assert sum = 3
+
+    # Multiple return values can be accessed via return value references.
+    let return_values = multiple_return_values()
+    assert return_values.value_1 = 42
+    assert return_values.value_2 = 43
+
+    # Multiple return values can also be "unpacked" into return value references via Tuples.
+    let (local value_1, local value_2) = multiple_return_values()
+    assert value_1 = 42
+    assert value_2 = 43
+
+    return ()
+end
+```
