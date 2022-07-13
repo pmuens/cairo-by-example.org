@@ -1,0 +1,42 @@
+# Strings
+
+A string in Cairo is represented via ASCII and can be at most 31 characters long.
+
+**"Why only 31 characters?"**
+
+A string will be represented via a Field Element (`felt`) which is currently a 252-bit number. Each ASCII character is represented via 8 bits.
+
+1 Field Element = 252 bits
+
+1 ASCII character = 8 bits
+
+252 / 8 = 31.5
+
+We can therefore store 31 characters in one `felt` (Field Element).
+
+The string's first character is the most significant byte of the integer (big-endian representation).
+
+Note that there isn't first-class citizen support for strings in Cairo. Strings are simply numbers stored in a Field Elements.
+
+## Example
+
+```cairo
+func main():
+    # String in human-readable format.
+    let greeting_string = 'Hello World!'
+
+    # The same string represented as an integer.
+    let greeting_decimal = 22405534230753928650781647905
+
+    # And as a hexadecimal value.
+    # Use an ASCII table such as https://www.rapidtables.com/code/text/ascii-table.html to map the
+    #   hexadecimal values to the individual characters.
+    #   e.g. search for the character `H` which equals `48` in hex.
+    let greeting_hexadecimal = 0x48656C6C6F20576F726C6421
+
+    assert greeting_string = greeting_decimal
+    assert greeting_decimal = greeting_hexadecimal
+
+    return ()
+end
+```
