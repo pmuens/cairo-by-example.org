@@ -1,0 +1,22 @@
+# Hello World
+
+Cairo can be used to write StarkNet Smart Contracts.
+
+The following is a `Greeter` Smart Contract that has a `greet` function which returns a simple greeting as a `felt` value.
+
+## Example
+
+```cairo
+# This declares that we're dealing with a StarkNet contract.
+%lang starknet
+
+# The `@view` decorator allows us to call `greet` externally.
+@view
+func greet() -> (greeting : felt):
+    # Internally the string is represented as a `felt`.
+    let greeting_string = 'Hello World!'
+
+    # Simply return the value of the `greeting_string` felt.
+    return (greeting_string)
+end
+```
