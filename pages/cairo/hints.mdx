@@ -1,0 +1,40 @@
+# Hints
+
+Because Cairo supports non-deterministic instructions (e.g. calculations can obtain a different value while still being valid) we need to provide hints to tell the Prover what to do exactly when computing ambiguous expressions which will later be verified by the Verifier.
+
+Hints are a requirement for the Prover to compute a valid proof. Furthermore they are only visible to the Prover, not the Verifier.
+
+A hint is a block of regular Python code.
+
+## Example
+
+```cairo
+func main():
+    alloc_locals
+
+    local result
+    let x = 25
+
+    # Hints are wrapped in `%{ %}` blocks.
+    %{
+        # This is a regular Python import.
+        import math
+
+        # Cairo-specific tokens such as variables, references, etc.
+        #   can be accessed via `ids`.
+        ids.result = int(math.sqrt(ids.x))
+
+        # Registers can be accessed via `memory`.
+        value = memory[ap - 1]
+        # This is a Python `assert` statement.
+        assert value == 5
+
+        # Hints can also be used for simple `print` debugging.
+        print("Value at [ap - 1] is:", value)
+    %}
+
+    assert result * result = x
+
+    return ()
+end
+```
