@@ -1,0 +1,37 @@
+# Pointers
+
+Pointers are ways to share data structures between Cairo functions.
+
+A pointer points to a memory address and can therefore be used to access the underlying value without passing around the actual value.
+
+Pointers can be identified by the `*` that follows the type declaration (e.g. `tuple*` or `Foo*`).
+
+To create a pointer one can prepend `&` to the variable name (e.g. `&foo`).
+
+## Example
+
+```cairo
+struct Point:
+    member x : felt
+    member y : felt
+end
+
+func create_point(x : felt, y : felt) -> (point : Point*):
+    # Create a `Point` via the `new` constructor which
+    #   returns a pointer to the underlying memory address.
+    tempvar point : Point* = new Point(x=x, y=y)
+
+    # Given that `point` is already a pointer there's no
+    #   need to write `&point`.
+    return (point)
+end
+
+func main():
+    let (point) = create_point(1, 2)
+
+    assert point.x = 1
+    assert point.y = 2
+
+    return ()
+end
+```
