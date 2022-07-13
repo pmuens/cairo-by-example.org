@@ -1,0 +1,47 @@
+# Allocating Memory
+
+Cairo supports the creation and storage of objects in memory. Once stored, a pointer to the object is returned which can be used by other functions.
+
+There are 3 different ways to allocate memory:
+
+1. Memory Segment Allocation
+   - Via `alloc`
+   - Creates an arbitrary length array
+2. Single Item Allocation
+   - Via `new` operator
+   - Initializes the item and returns a pointer to it
+3. Local Variables
+   - Allocate a variable to retrieve its address
+
+## Example
+
+```cairo
+from starkware.cairo.common.alloc import alloc
+
+struct Point:
+    member x : felt
+    member y : felt
+end
+
+func main():
+    # `alloc` can be used to allocate new memory segments dynamically.
+    # Segments can store a single element...
+    let (x : felt*) = alloc()
+
+    # ...or an array.
+    let (points_array : Point*) = alloc()
+    assert points_array[0] = Point(x=1, y=2)
+    assert points_array[1] = Point(x=3, y=4)
+
+    # The `new` operator pushes an object onto the stack and returns a pointer to it.
+    tempvar pointer : Point* = new Point(x=1, y=2)
+    assert pointer.x = 1
+    assert pointer.y = 2
+
+    # `new` can also be used to allocate a fixed-size array using tuples.
+    tempvar tuples : felt* = new (1, 2, 3, 4, 5)
+    assert tuples[2] = 3
+
+    return ()
+end
+```
