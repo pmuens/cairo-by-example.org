@@ -1,0 +1,50 @@
+# Structs
+
+With `struct` one can define arbitrary data types. They are implemented as a continuous list of `felt` values in memory.
+
+Structs can be instantiated via the `new` keyword (note that `new` can't be used with `let`).
+
+Members in structs can be accessed via the dot syntax (e.g. `Foo.bar`).
+
+Struct pointers are implicitly casted to `felt` pointers (e.g. `Foo*` is casted to `felt*`).
+
+## Example
+
+```cairo
+# A user-defined Struct called `Point`.
+struct Point:
+    member x : felt
+    member y : felt
+end
+
+func get_origin() -> (origin : Point):
+    let origin = Point(x=0, y=0)
+    return (origin)
+end
+
+func main():
+    alloc_locals
+
+    # We can't use `let` to create a new `Point` with the `new` keyword...
+    # let point_1 = new Point(x=1, y=2)
+
+    # ...but `local` works...
+    local point_1 : Point* = new Point(x=1, y=2)
+    # ...and so does `tempvar`.
+    tempvar point_2 : Point* = new Point(x=3, y=4)
+
+    # To use `let` we can use the following syntax.
+    let point_3 = Point(x=5, y=6)
+
+    # Members in structs can be accessed via the `.` syntax.
+    assert point_1.x = 1
+    assert point_1.y = 2
+
+    # Structs can also be received as return values from functions.
+    let (origin) = get_origin()
+    assert origin.x = 0
+    assert origin.y = 0
+
+    return ()
+end
+```
