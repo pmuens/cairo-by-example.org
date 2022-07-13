@@ -1,0 +1,56 @@
+# Recursion
+
+Cairo doesn't support familiar loop constructs such as `for`, `while` or `do while`. However one can express loops via recursion which is defined as a function calling itself.
+
+The following example shows how the [Fibonacci Sequence](https://en.wikipedia.org/wiki/Fibonacci_number) can be computed via recursion in Cairo.
+
+## Example
+
+```cairo
+func fibonacci(n : felt) -> (result : felt):
+    # We're using `alloc_locals` here to avoid reference revocations.
+    alloc_locals
+
+    # Every recursion should terminate at some point so we define
+    #   if statements here that return regular values rather than a call to
+    #   the function itself.
+    # Note: Start by writing these termination rules when you turn a loop into
+    #   a recursion to make authoring recursions easier.
+    if n == 0:
+        return (0)
+    end
+    if n == 1:
+        return (1)
+    end
+
+    # Here's "the meat" of the recursion as we're calling the function
+    #   itself again.
+    let (fib_1) = fibonacci(n - 1)
+    let (fib_2) = fibonacci(n - 2)
+
+    return (fib_1 + fib_2)
+end
+
+func sum(n : felt, running_total : felt) -> (result : felt):
+    if n == 0:
+        return (running_total)
+    end
+
+    # This is a special form of recursion called "Tail Recursion".
+    # Tail Recursion occurs when a function ends by calling a second function
+    #   immediately.
+    # Tail Recursion are more efficient as they can utilize a technique called
+    #   ["Tail Call Optimization"](https://en.wikipedia.org/wiki/Tail_call).
+    return sum(n - 1, running_total + n)
+end
+
+func main():
+    let (result) = fibonacci(10)
+    assert result = 55
+
+    let (result) = sum(20, 0)
+    assert result = 210
+
+    return ()
+end
+```
