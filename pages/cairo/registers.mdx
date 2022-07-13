@@ -1,0 +1,52 @@
+# Registers
+
+Registers are pointers which are used to keep track of important runtime information. They are the only values that may change during program execution.
+
+In Cairo there are 3 designated registers:
+
+1. `ap`: Allocation Pointer
+   - Points to the next, unused memory cell
+2. `fp`: Frame Pointer
+   - Points to the frame of the current function
+   - Addresses of arguments are relative to this register
+   - Addresses of local variables are relative to this register
+   - `fp` is equal to `ap` when the function execution starts
+   - `fp` remains the same throughout the scope of the function
+3. `pc`: Program Counter
+   - Points to the current instruction
+
+## Example
+
+```cairo
+func add(a : felt, b : felt) -> (result : felt):
+    # The `call` instructions which causes a function to be called
+    #   pushes 2 more values onto the stack (the next `pc` and the current `fp`).
+    # Because of this, the functions arguments are accessible at `[fp - 3]`, `[fp - 4]`, ... , `[fp - n]` respectively.
+    # The return values are pushed onto the stack right before the function exits via `ret`.
+
+    # The following code is equivalent to `return (result=a + b)`.
+    [ap] = [fp - 3] + [fp - 4]; ap++
+    ret
+end
+
+func main():
+    # Set the value of the current, unused memory cell to 1
+    #   and increment the Allocation Pointer to point to the next cell.
+    [ap] = 1; ap++
+
+    # Function arguments should be written to the stack before the `call` instruction.
+    # Here we push the value `1` and `2` onto the stack before we call the `add` function.
+    # The following code is equivalent to `add(1, 2)`.
+    [ap] = 1; ap++
+    [ap] = 2; ap++
+    call add
+
+    # The return value of a function execution is pushed to the stack before the
+    #   function returns. The `ap` is increment automatically.
+    #   We can therefore access the return value via `[ap - 1]`.
+    # Multiple return values can be accessed via `[ap - 1]`, [ap - 2], ... , `[ap - n]` respectively.
+    assert [ap - 1] = 3
+
+    ret
+end
+```
