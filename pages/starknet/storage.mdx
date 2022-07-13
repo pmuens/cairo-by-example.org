@@ -1,0 +1,36 @@
+# Storage
+
+Data in a Cairo is transient which means that it isn't persistet once the program exits (Cairo programs are stateless).
+
+If we're operating in the Blockchain space we want state to persist so it would be great if we can store values in one transaction and load them later on in another. Storage variables let's us do exactly that.
+
+Persistent state can be implemented via a function that's annotated with the `@storage_var` decorator. Once done, the function will automatically expose 2 functions. One for reading state (`read`) and one for writing state (`write`).
+
+Values that are not explicitly set default to their "zero value". For a `felt` the "zero value" is `0`.
+
+## Example
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+# This decorator declares a state variable called `value`.
+@storage_var
+func value() -> (result : felt):
+end
+
+@view
+func get{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (result : felt):
+    # Read the current state of `value`.
+    let (result) = value.read()
+    return (result)
+end
+
+@external
+func set{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(new_value : felt):
+    # Update the state of `value`.
+    value.write(new_value)
+    return ()
+end
+```
