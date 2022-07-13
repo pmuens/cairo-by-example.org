@@ -1,0 +1,8 @@
+{
+  "constructor": "Constructor",
+  "contract-calls": "Contract Calls",
+  "hello-world": "Hello World",
+  "mappings": "Mappings",
+  "storage": "Storage",
+  "visibility": "Visibility"
+}
