@@ -1,0 +1,38 @@
+# Inputs
+
+Cairo programs support secret inputs and public outputs.
+
+By providing an input to a Cairo program one can compute a proof that the output specific to the secret input is valid without giving away the secret input.
+
+Program inputs can be provided via a `.json` file that can be passed-in via the CLI option `--program_input`.
+
+Program inputs can be accessed in Hints. Remember that the code in a Hint block (`%{ %}`) is only accessible to the Prover and will be opaque to the Verifier, hence ensuring secrecy of the input.
+
+Consider the following `input.json` file:
+
+```sh
+{
+  "prime_1": 3,
+  "prime_2": 5
+}
+```
+
+The input can be provided to the Cairo program like this: `cairo run program.cairo --program_input=input.json`.
+
+## Example
+
+```cairo
+func main():
+    alloc_locals
+
+    local result
+    let expected = 15
+
+    %{ ids.result = program_input["prime_1"] * program_input["prime_2"] %}
+
+    # Proof that we know the Prime factors.
+    assert result = expected
+
+    return ()
+end
+```
