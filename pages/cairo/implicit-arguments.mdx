@@ -1,0 +1,118 @@
+# Implicit Arguments
+
+Cairo supports a concept called "Implicit Arguments" which automatically adds arguments and return values to functions that one would otherwise need to add manually.
+
+Implicit Arguments come in handy when using functions that use and manipulate pointers.
+
+Given that Cairo memory is immutable one has to do pointer arithmetic manually to be able to reuse the same functions multiple times. One such example is the creation of a hash based on input values. The values are stored in memory at the location where the pointer of the hash function will point to. However in order to be able to reuse the hash functionality one has to ensure that the pointer is updated so that it points to new, unallocated memory.
+
+While the manual manipulation of pointers and the returning of an updated pointer from functions can be done manually, it's much more convenient to use Implicit Arguments which will do all of this for us automatically.
+
+Implicit Arguments immediately follow the function name in curly braces `{}`.
+
+## Example
+
+```cairo
+%builtins pedersen
+
+from starkware.cairo.common.hash import hash2
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+# This function doesn't use Implicit Arguments.
+# We manage the pointers manually so we need to get the pointer as an argument and
+#   return an updated version of it.
+func hash_pointer_management(ptr : HashBuiltin*, x : felt, y : felt) -> (
+    updated_ptr : HashBuiltin*, z : felt
+):
+    # The hash function expects the value for `x` to be at the current pointer position...
+    let x_ref = cast(ptr, felt*)
+    # ...`y` should be located at "current position + 1"...
+    let y_ref = cast(ptr + 1, felt*)
+    # ...and the result will be written at the location "current position + 2.
+    let z_ref = cast(ptr + 2, felt*)
+
+    [x_ref] = x
+    [y_ref] = y
+
+    let z = [z_ref]
+    # To ensure that we can reuse the hash functionality we have to point to the next,
+    #   empty memory cell.
+    let updated_ptr = ptr + 3
+
+    # Return the updated pointer and the result.
+    return (updated_ptr, z)
+end
+
+# This function doesn't use Implicit Arguments.
+# We manage the pointers manually so we need to get the pointer as an argument and
+#   return an updated version of it.
+func hash_typed_references(ptr : HashBuiltin*, x : felt, y : felt) -> (
+    updated_ptr : HashBuiltin*, z : felt
+):
+    # Thanks to "Typed References" we can explicitly set `x` and `y` on the pointer itself.
+    ptr.x = x
+    ptr.y = y
+
+    let z = ptr.result
+    # Given that we're using the `HashBuiltin` we can grab its size like so.
+    let updated_ptr = ptr + HashBuiltin.SIZE
+
+    # Return the updated pointer and the result.
+    return (updated_ptr, z)
+end
+
+# This function has an Implicit Argument called `pedersen_ptr`.
+func hash_rebinding{pedersen_ptr : HashBuiltin*}(x : felt, y : felt) -> (z : felt):
+    # Because `hash2` expects an Implicit Argument called `hash_ptr` we need
+    #   to rebind it to `hash_ptr`.
+    let (z) = hash2{hash_ptr=pedersen_ptr}(x, y)
+    return (z)
+end
+
+# This function has an Implicit Argument called `hash_ptr`.
+func hash_implicit{hash_ptr : HashBuiltin*}(x : felt, y : felt) -> (z : felt):
+    # The Implicit Argument of the calling function is already
+    #   called `hash_ptr` so `hash2` can reuse it as is and we therefore
+    #   don't need to define it again.
+    let (z) = hash2(x, y)
+    return (z)
+end
+
+# This function doesn't use Implicit Arguments as it takes the `hash_ptr` as a regular argument.
+func hash_with_statement(hash_ptr : HashBuiltin*, x : felt, y : felt) -> (
+    hash_ptr : HashBuiltin*, z : felt
+):
+    # The `with` statements will rebind `hash_ptr` so that it can be used like an
+    #   explicit argument in `hash2`.
+    # Note that the `hash_ptr` was passed-into this function as a regular argument, not
+    #   an Implicit Argument!
+    with hash_ptr:
+        let (z) = hash2(x, y)
+    end
+
+    return (hash_ptr, z)
+end
+
+func main{pedersen_ptr : HashBuiltin*}():
+    alloc_locals
+
+    local expected = 2592987851775965742543459319508348457290966253241455514226127639100457844774
+
+    let (pedersen_ptr, result) = hash_pointer_management(pedersen_ptr, 1, 2)
+    assert result = expected
+
+    let (pedersen_ptr, result) = hash_typed_references(pedersen_ptr, 1, 2)
+    assert result = expected
+
+    let (result) = hash_rebinding(1, 2)
+    assert result = expected
+
+    let (result) = hash_implicit{hash_ptr=pedersen_ptr}(1, 2)
+    assert result = expected
+
+    let (pedersen_ptr, result) = hash_with_statement(pedersen_ptr, 1, 2)
+    assert result = expected
+
+    return ()
+end
+```
