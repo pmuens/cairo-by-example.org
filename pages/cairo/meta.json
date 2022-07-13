@@ -1,0 +1,22 @@
+{
+  "allocating-memory": "Allocating Memory",
+  "arrays": "Arrays",
+  "assert": "Assert",
+  "error-messages": "Error Messages",
+  "functions": "Functions",
+  "hints": "Hints",
+  "if-else": "If / Else",
+  "implicit-arguments": "Implicit Arguments",
+  "imports": "Imports",
+  "inputs": "Inputs",
+  "jumps": "Jumps",
+  "memory": "Memory",
+  "outputs": "Outputs",
+  "pointers": "Pointers",
+  "recursion": "Recursion",
+  "registers": "Registers",
+  "strings": "Strings",
+  "structs": "Structs",
+  "tuples": "Tuples",
+  "variables": "Variables"
+}
