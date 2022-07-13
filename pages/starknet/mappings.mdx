@@ -1,0 +1,66 @@
+# Mappings
+
+Mappings can be created via functions that are annotated with the `@storage` decorator and receive at least 1 `felt` parameter.
+
+Nested mappings can be created by adding more than 1 parameter.
+
+When using the storage functions `read` and `write` one has to supply the key(s) as the first argument(s) if nested mappings are used.
+
+## Example
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+const KEY_1 = 1
+const KEY_2 = 2
+const VALUE = 42
+
+# A regular storage variable (no mapping).
+@storage_var
+func no_mapping() -> (value : felt):
+end
+
+# Maps a key to a storage value.
+# Similar to `array[key]`.
+@storage_var
+func mapping_1dim(key : felt) -> (value : felt):
+end
+
+# Maps a key to a key to a storage value.
+# Similar to `array[key_1][key_2]`.
+@storage_var
+func mapping_2dim(key_1 : felt, key_2 : felt) -> (value : felt):
+end
+
+@view
+func read{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
+    value_no_mapping : felt, value_mapping_1dim : felt, value_mapping_2dim : felt
+):
+    # No key necessary to pass-in.
+    let (value_no_mapping) = no_mapping.read()
+
+    # We have a key we need to pass-in.
+    let (value_mapping_1dim) = mapping_1dim.read(KEY_1)
+
+    # We have 2 keys we need to pass-in.
+    let (value_mapping_2dim) = mapping_2dim.read(KEY_1, KEY_2)
+
+    return (value_no_mapping, value_mapping_1dim, value_mapping_2dim)
+end
+
+@external
+func write{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
+    # We don't have a key so the function only takes 1 parameter which is the value.
+    no_mapping.write(VALUE)
+
+    # We have a key, so we need to pass-in the key and the value.
+    mapping_1dim.write(KEY_1, VALUE)
+
+    # We have 2 keys, so we need to pass-in the keys and the value.
+    mapping_2dim.write(KEY_1, KEY_2, VALUE)
+
+    return ()
+end
+```
