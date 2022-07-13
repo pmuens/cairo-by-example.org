@@ -1,0 +1,52 @@
+# Contract Calls
+
+StarkNet Smart Contracts can call one another which enables extensibility and composability.
+
+To call another contract, the calling contract only needs to know the interface of the contract to be called. The called contract doesn't need to do anything special and isn't even aware that it's called from another contract.
+
+An interface is a Cairo `namespace` decorated with the `@contract_interface` annotation and only needs to contain the functions that the caller might invoke. Interface function declarations must have an empty body.
+
+When calling an interface function the first parameters is always the underlying Smart Contract's address.
+
+Contract interface names should follow the convention of being prefixed with `I` which indicates that it's an interface.
+
+You can use `assert` or `if` statements to guard function invocations by e.g. checking against a list of allowed / blocked contract addresses.
+
+In this example we'll be calling `NumberContract`'s `get_number()` function:
+
+```cairo
+%lang starknet
+
+@view
+func get_number() -> (number : felt):
+    return (42)
+end
+```
+
+## Example
+
+```cairo
+%lang starknet
+
+# The `@contract_interface` decorator turns this `namespace` into an interface
+#   we can use.
+# Note that the namespace is prefixed with an `I`.
+@contract_interface
+namespace INumberContract:
+    # This is the funciton we'll call.
+    # Note that the function body is empty.
+    func get_number() -> (number : felt):
+    end
+end
+
+@external
+func read_number{syscall_ptr : felt*, range_check_ptr}(address : felt) -> (number : felt):
+    # Here we're calling the `get_number` function on the
+    #   `NumberContract` via the `INumberContract` interface.
+    # Note that the first parameter that's passed-in always has to be
+    #   the Smart Contract address
+    let (number) = INumberContract.get_number(address)
+
+    return (number)
+end
+```
