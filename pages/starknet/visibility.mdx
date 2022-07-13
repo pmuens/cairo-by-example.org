@@ -1,0 +1,60 @@
+# Visibility
+
+StarkNet Smart Contracts have no `main` function as an entrypoint like normal Cairo programs do.
+
+Decorators are used to annotate and and expose functions to the outside world.
+
+Smart Contract functions can have 3 levels of visibility:
+
+1.  External
+    - `@external` decorator
+    - Queries state and might modify it
+    - Can be called by StarkNet users and other contracts
+    - Can only have `felt` arguments
+2.  View
+    - `@view` decorator
+    - Only queries state and doesn't modify it
+    - Can be called by StarkNet users and other contracts
+    - Only semantic meaning as it's not enforced by the compiler at the moment
+    - Can only have `felt` arguments
+3.  Internal / Private
+    - No decorator
+    - Might query and / or modify state
+    - Not accessible from the outside
+    - Can have any argument type
+
+## Example
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+@storage_var
+func counter() -> (value : felt):
+end
+
+# Using `@view` indicates that state should only be queried.
+# This function is accessible from the outside by users and other Smart Contracts.
+@view
+func read{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (result : felt):
+    let (current) = get()
+    return (result=current)
+end
+
+# Using `@external` indicates that state can be written and queried.
+# This function is accessible from the outside by users and other Smart Contracts.
+@external
+func inc{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
+    let (current) = get()
+    counter.write(current + 1)
+    return ()
+end
+
+# No decorator indicates that it's an internal / private function.
+# This function is not accessible from the outside and is internal to this Smart Contract.
+func get{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (result : felt):
+    let (value) = counter.read()
+    return (result=value)
+end
+```
