@@ -1,0 +1,38 @@
+# Constructor
+
+Oftentimes it's necessary to initialize a Smart Contract's state upon deployment before public use.
+
+The `@constructor` decorator let's you annotate a function that should be called immediately after the Smart Contract is deployed to StarkNet.
+
+The function annotated with `@constructor` should also be named `constructor`.
+
+Note that it's not possible to call this function ever again.
+
+## Example
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+@storage_var
+func owner() -> (address : felt):
+end
+
+# This function will be called immediately after the Smart Contract was deployed to StarkNet.
+# It cannot be called again.
+# Note that the function name is `constructor`.
+@constructor
+func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(address : felt):
+    owner.write(address)
+    return ()
+end
+
+@view
+func get_owner{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
+    address : felt
+):
+    let (address) = owner.read()
+    return (address)
+end
+```
