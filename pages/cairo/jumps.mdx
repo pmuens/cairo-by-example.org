@@ -1,0 +1,38 @@
+# Jumps
+
+In Cairo each instruction takes a space of 1 or 2 field elements in memory.
+
+`pc` is the Program Counter that keeps track of the current instruction's address and is advanced by 1 or 2 per instructions (depending on the instruction's size). The `jmp` instruction can be used to jump to different instructions.
+
+There are 3 different `jmp` instructions one can use:
+
+1. `jmp abs`: Absolute Jump
+   - Jumps to a given address directly (e.g. `jmp abs 42`)
+2. `jmp rel`: Relative Jump
+   - Jumps to an offset relative to the current instruction (e.g. `jmp rel 42`)
+3. `jmp <label>`: Label Jump
+   - A Relative Jump where the Cairo compiler automatically resolves labels to their relative values (e.g. `jmp foo`)
+
+Jumps can also be conditional which has the following syntax: `jmp [<abs> | <rel> | <label>] if [<expression>] != 0`. The `<expression>` has to be `ap + offset` or `fp + offset` (the offset is optional). Cairo will cause a jump to happen if the memory cell is not `0`. You can write a `0` into the memory cell to not jump and continue with regular program execution.
+
+## Example
+
+```cairo
+func main():
+    # Write the value `10` to memory.
+    [ap] = 10; ap++
+
+    # This is our label we use in our `jmp` instruction below.
+    countdown_loop:
+    # We read the last value from memory, subtract `1` and write the new value to memory.
+    [ap] = [ap - 1] - 1; ap++
+    # We check if the last memory value is `0`.
+    # If the value is not `0` we jump back to `countdown_loop`.
+    # If the value is `0` we continue with our regular execution.
+    jmp countdown_loop if [ap - 1] != 0
+
+    assert [ap - 1] = 0
+
+    ret
+end
+```
