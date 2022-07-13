@@ -1,0 +1,37 @@
+# Outputs
+
+Outputs can be written to standard output via the `output` builtin.
+
+The CLI options `--layout=small` and `--print_output` need to be provided to the `cairo-run` command to see the output.
+
+Once the `output` builtin is added, one can write to the `output_ptr` which has to be provided as an implicit argument to the `main` function.
+
+Run a Cairo program like the following to see the program's output: `cairo-run program.cairo --layout=small --program_output`.
+
+## Example
+
+```cairo
+# This `builtin` is necessary to support program outputs.
+%builtins output
+
+from starkware.cairo.common.serialize import serialize_word
+
+# Main now gets the `output_ptr` as an implicit argument.
+func main{output_ptr : felt*}():
+    let number = 42
+
+    # We can use `serialize_word` to print a value...
+    serialize_word(number)
+
+    # ...or use the `output_ptr` directly.
+    # Write the value `42` to memory.
+    [ap] = number
+
+    # # Point the `output_ptr` to the memory location with the value `42`.
+    [ap] = [output_ptr]; ap++
+    # # return the value of `output_ptr` which was advanced by 1.
+    [ap] = output_ptr + 1; ap++
+
+    ret
+end
+```
