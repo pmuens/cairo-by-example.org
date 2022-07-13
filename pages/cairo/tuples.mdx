@@ -1,0 +1,47 @@
+# Tuples
+
+Tuples are an ordered collection of elements. They can consist of any combination of valid types (including Tuples themselves).
+
+Tuples are represented as a comma-separated list of elements enclosed in `()` (e.g. `(1, 2, 3, 4)`).
+
+To distinguish Tuples from regular parenthesis it's necessary to add a trailing comma to single-element Tuples (e.g. `(1,)`).
+
+To access elements within a Tuple one can use the Tuple's index (which starts at `0`) in square brackets.
+
+Nested Tuples can be accessed via additional indices.
+
+## Example
+
+```cairo
+func main():
+    # Regular Tuple.
+    let regular_tuple = (1, 2, 3, 4, 5)
+
+    # Element access in a non-nested Tuple.
+    let regular_accessed = regular_tuple[1]
+    assert regular_accessed = 2
+
+    # Single-element tuple.
+    let single_element_tuple = (1,)
+    assert single_element_tuple[0] = 1
+
+    # Nested Tuple.
+    let nested_tuple = (1, (2, (3, 4), 5), 6)
+
+    # Element access in a nested Tuple.
+    let nested_accessed = nested_tuple[1][1][0]
+    assert nested_accessed = 3
+
+    # Tuples can also be used to define types.
+    let tuple : (felt, felt) = (1, 2)
+    assert tuple[0] = 1
+    assert tuple[1] = 2
+
+    # Named tuples can be defined like follows.
+    let point : (x : felt, y : felt) = (x=1, y=2)
+    assert point[0] = 1
+    assert point[1] = 2
+
+    return ()
+end
+```
