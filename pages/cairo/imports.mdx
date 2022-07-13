@@ -1,0 +1,39 @@
+# Imports
+
+Cairo programs can be split up into multiple source files to ensure modularity and code-reuse.
+
+Cairo will automatically detect multiple imports with the same name as well as cyclic imports.
+
+By default Cairo searches the current directory and the standard library directory relative to the compiler path. This behavior can be extended via the `--cairo_path` option and the `CAIRO_PATH` environment variable:
+
+```sh
+cairo-compile --cairo_path="/foo/bar/baz/my_libraries" ...
+CAIRO_PATH="/foo/bar/baz/my_libraries" cairo-compile ...
+```
+
+Consider the following source code directory:
+
+```sh
+|__this_file.cairo
+|__dir_a
+    |__foo.cairo
+    |__dir_b
+        |__bar.cairo
+```
+
+## Example
+
+```cairo
+# We can import tokens such as functions, structs, etc. from
+#   the `a.cairo` file like this.
+from dir_a.foo import calculate_radius
+
+# Imports can aliased via the `as` keyword.
+from dir_a.foo import calculate_radius as radius
+
+# Multiple tokens can be imported by listing them comma-separated.
+from dir_a.foo import Circle, calculate_radius
+
+# Tokens in files located in nested directories can be accessed by chaining file- and directory names via dots.
+from dir_a.dir_b.bar import Square, calculate_area
+```
