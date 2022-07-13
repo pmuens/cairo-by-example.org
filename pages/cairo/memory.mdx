@@ -1,0 +1,41 @@
+# Memory
+
+Memory in Cairo is non-deterministic and read-only:
+
+- Non-deterministic
+  - The value for each memory call is chosen by the Prover
+- Read-only
+  - Once value is written it cannot be changed during program execution
+
+Memory addresses accessed during program execution must be continuous. The order of access doesn't matter, though (e.g. one can access memory at address 1, 3, and 2 before the program terminates).
+
+Gaps in the address range will be filled with arbitrary values by the Prover. This "Gap-filling" will cause inefficiencies as memory is consumed without being used.
+
+## Example
+
+```cairo
+from starkware.cairo.common.alloc import alloc
+
+func main():
+    # Allocate a new memory segment.
+    let (x : felt*) = alloc()
+
+    # Set the value of `x` to 1.
+    assert [x] = 1
+
+    # Set the value of `x` to 2.
+    # This fails because we already set the value above.
+    # assert [x] = 2
+
+    # This succeeds given that we increment the memory address by 1 before assignment.
+    # assert [x + 1] = 2
+
+    # Given that the allocation of memory at `x + 1` is commented out we create an inefficiency here...
+    assert [x + 2] = 2
+
+    # ...unless we still use the memory at `x + 1` before the program terminates.
+    assert [x + 1] = 2
+
+    ret
+end
+```
