@@ -1,0 +1,48 @@
+# Authentication
+
+The `get_caller_address` utility function returns the address that's calling the contract.
+
+An authentication pattern can be implemented by using the `get_caller_address` utility function in combination with `assert`.
+
+## Example
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+from starkware.starknet.common.syscalls import get_caller_address
+
+# This storage variable is used to keep track of the current owner.
+@storage_var
+func owner() -> (address : felt):
+end
+
+# The owner is set upon contract deployment.
+@constructor
+func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(address : felt):
+    owner.write(address)
+    return ()
+end
+
+# A function that should only be accessible by the current owner.
+@view
+func get_secret{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
+    secret : felt
+):
+    only_owner()
+    return (42)
+end
+
+# Internal function that ensures that the entity calling the contract is the current owner.
+func only_owner{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
+    # Get the current owner via our `owner` storage variable.
+    let (current_owner) = owner.read()
+    # Get the caller address via the `get_caller_address` utility function.
+    let (caller) = get_caller_address()
+
+    # Check that the caller is the current owner.
+    assert caller = current_owner
+
+    return ()
+end
+```
