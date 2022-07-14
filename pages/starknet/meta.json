@@ -1,4 +1,5 @@
 {
+  "authentication": "Authentication",
   "constructor": "Constructor",
   "contract-calls": "Contract Calls",
   "hello-world": "Hello World",
