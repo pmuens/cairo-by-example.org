@@ -15,6 +15,7 @@
   "pointers": "Pointers",
   "recursion": "Recursion",
   "registers": "Registers",
+  "signature-verification": "Signature Verification",
   "strings": "Strings",
   "structs": "Structs",
   "tuples": "Tuples",
