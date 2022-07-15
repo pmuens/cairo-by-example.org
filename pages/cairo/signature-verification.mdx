@@ -1,0 +1,78 @@
+# Signature Verification
+
+Cairo has support to verify ECDSA signatures via the `ecdsa` builtin and the `verify_ecdsa_signature` function.
+
+## Example
+
+The following is a Python script that demonstrates how to generate an ECDSA signature for the message `42`:
+
+```python
+from starkware.crypto.signature.signature import (
+    sign,
+    pedersen_hash,
+    private_to_stark_key,
+)
+
+
+def main():
+    # Note: You should use a secure source of randomness when
+    #   you generate a private key.
+    priv_key = 12345678
+    pub_key = private_to_stark_key(priv_key)
+
+    msg = 42
+    # Hashing the message so that we can sign it.
+    msg_hash = pedersen_hash(msg)
+
+    # Creating a signature of the message hash with our private key.
+    r, s = sign(msg_hash, priv_key)
+
+    print(
+        f"""
+msg:      {msg}
+msg_hash: {msg_hash}
+pub_key:  {pub_key}
+r:        {r}
+s:        {s}
+"""
+    )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Running the script produces the following output:
+
+```sh
+msg:      42
+msg_hash: 3024046557455497363580104900700010992073497311783761970049125873907615018679
+pub_key:  700486945785093896215451679915330918764422796552594089817843617223540797798
+r:        76350106573216761435080086889032248828552866921601503194377969478483208055
+s:        1021442279391122344180195554869989785928240100220091002338062629385720297360
+```
+
+We can use the `verify_ecdsa_signature` function in combination with the `ecdsa` builtin to verify the signature in a Cairo program:
+
+```cairo
+# Declare that we want to use the `ecdsa` builtin.
+%builtins ecdsa
+
+from starkware.cairo.common.cairo_builtins import SignatureBuiltin
+from starkware.cairo.common.signature import verify_ecdsa_signature
+
+# We need to pass in the `ecdsa_ptr` implicit argument.
+func main{ecdsa_ptr : SignatureBuiltin*}():
+    # These are the variables our Python script generated.
+    let msg_hash = 3024046557455497363580104900700010992073497311783761970049125873907615018679
+    let pub_key = 700486945785093896215451679915330918764422796552594089817843617223540797798
+    let r = 76350106573216761435080086889032248828552866921601503194377969478483208055
+    let s = 1021442279391122344180195554869989785928240100220091002338062629385720297360
+
+    # Verifying the ECDSA signature.
+    # This function throws an error if the signature is invalid.
+    verify_ecdsa_signature(msg_hash, pub_key, r, s)
+
+    return ()
+end
+```
