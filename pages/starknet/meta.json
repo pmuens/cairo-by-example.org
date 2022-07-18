@@ -1,5 +1,6 @@
 {
   "authentication": "Authentication",
+  "block-information": "Block Information",
   "constructor": "Constructor",
   "contract-calls": "Contract Calls",
   "hello-world": "Hello World",
