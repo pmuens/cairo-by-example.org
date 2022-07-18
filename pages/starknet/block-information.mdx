@@ -1,0 +1,21 @@
+# Block Information
+
+The 2 helper functions `get_block_number` and `get_block_timestamp` can be used to access a Block's current number and Unix timestamp.
+
+The Block's timestamp is represented as the seconds since the Unix epoch (1 January 1970) and can be picked arbitrarily by the Sequencer (i.e. it's not enforced on the StarkNet OS level).
+
+## Example
+
+```cairo
+%lang starknet
+
+from starkware.starknet.common.syscalls import get_block_number, get_block_timestamp
+
+@view
+func get_block_information{syscall_ptr : felt*}() -> (number : felt, timestamp : felt):
+    let (number) = get_block_number()
+    let (timestamp) = get_block_timestamp()
+
+    return (number, timestamp)
+end
+```
