@@ -1,0 +1,28 @@
+# Events
+
+Events allow for the output of information during contract execution. Such data can later on be consumed by other entities outside of StarkNet.
+
+The difference between [Storage](/starknet/storage)- and Event data is that Storage data can be used from within Smart Contracts whereas Event data cannot.
+
+Events are implemented via functions decorated with the `@event` annotation. Calling `emit` on such functions will output the Event data.
+
+## Example
+
+```cairo
+%lang starknet
+
+# The `@event` annotation turns this function into an Event emitter.
+@event
+func logger(number : felt):
+end
+
+@external
+func get_number{syscall_ptr : felt*, range_check_ptr}() -> (number : felt):
+    let number = 42
+
+    # Calling `emit` will output the Event data (the number 42 in our case).
+    logger.emit(number)
+
+    return (number)
+end
+```
