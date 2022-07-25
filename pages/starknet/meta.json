@@ -3,6 +3,7 @@
   "block-information": "Block Information",
   "constructor": "Constructor",
   "contract-calls": "Contract Calls",
+  "events": "Events",
   "hello-world": "Hello World",
   "mappings": "Mappings",
   "storage": "Storage",
