@@ -1,0 +1,129 @@
+# L1 to L2 Communication
+
+StarkNet contracts can receive messages from L1.
+
+Functions annotated with the `@l1_handler` can be called from the "StarkNet Core Contract" deployed by the StarkWare team on L1 by invoking the `sendMessageToL2` function.
+
+A StarkNet contract can have multiple functions annotated with `@l1_handler`. A selector which is a number that uniquely identifies the function name will be used to distinguish between different `@l1_handler`s.
+
+The arguments received by the function annotated with `@l1_handler` are the L1 contract address that sent the message, followed by the message elements in the order they were sent.
+
+When calling `sendMessageToL2` on the StarkNet Core Contract on L1, one needs to supply the L2 contract address, the function selector and the payload encoded as an array.
+
+## Example
+
+At first, we need to create our StarkNet contract which has a function annotated with `@l1_handler`:
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+@storage_var
+func sum() -> (result : felt):
+end
+
+@view
+func get_sum{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
+    result : felt
+):
+    let (result) = sum.read()
+    return (result)
+end
+
+# This is the function that can be called from L1.
+@l1_handler
+func add{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    from_address : felt, a : felt, b : felt
+):
+    # Note: It might be useful to check for whitelisted L1 contracts here.
+
+    # We just compute the sum and store it to a storage variable
+    #   so that we can inspect it later on.
+    sum.write(a + b)
+
+    return ()
+end
+```
+
+We can use the following Python script to get the selector number for our `@l1_handler` function:
+
+```python
+from starkware.starknet.compiler.compile import get_selector_from_name
+
+
+def main():
+    FUNCTION_NAME = "add"
+    selector = get_selector_from_name(FUNCTION_NAME)
+    print(selector)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Running the script produces the following output:
+
+```sh
+1516919092654529690972514611118255134945769636354332808776333403020481942377
+```
+
+Next up we can write a Solidity Smart Contract that we'll deploy on L1. This contract uses the StarkNet Core Contract to send our message via `sendMessageToL2` from L1 to L2.
+
+```solidity
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
+
+// Interface definition so that we can use the StarkNet Core Contract.
+interface IStarknetCore {
+    function sendMessageToL2(
+        uint256 toAddress,
+        uint256 selector,
+        uint256[] calldata payload
+    ) external returns (bytes32);
+}
+
+contract L1ToL2 {
+    IStarknetCore starknetCore;
+
+    // This is the selector number we've computed above via our Python script.
+    uint256 constant ADD_SELECTOR =
+        1516919092654529690972514611118255134945769636354332808776333403020481942377;
+
+    // Set the StarkNet Core Contract upon deployment.
+    constructor(IStarknetCore starknetCore_) {
+        starknetCore = starknetCore_;
+    }
+
+    // The function that will be invoked to send a message to L2.
+    // Note: The `l2ContractAddress` is passed-in as an argument.
+    function sendMessage(
+        uint256 l2ContractAddress,
+        uint256 a,
+        uint256 b
+    ) external {
+        // Our payload will be two numbers: `a` and `b`.
+        uint256 payloadSize = 2;
+
+        // Create the payload as an in-memory array of length 2
+        //  and add the two numbers to the array slots.
+        uint256[] memory payload = new uint256[](payloadSize);
+        payload[0] = a;
+        payload[1] = b;
+
+        // Use the `sendMessageToL2` functionality provided by the
+        //  StarkNet Core Contract to send our payload to our `add` function on L2.
+        starknetCore.sendMessageToL2(l2ContractAddress, ADD_SELECTOR, payload);
+    }
+}
+```
+
+## Addresses
+
+### StarkNet Core Contract - Mainnet Alpha
+
+[0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4](https://etherscan.io/address/0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4)
+
+### StarkNet Core Contract - Goerli Alpha
+
+[0xde29d060D45901Fb19ED6C6e959EB22d8626708e](https://goerli.etherscan.io/address/0xde29d060D45901Fb19ED6C6e959EB22d8626708e)
