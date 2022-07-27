@@ -5,6 +5,7 @@
   "contract-calls": "Contract Calls",
   "events": "Events",
   "hello-world": "Hello World",
+  "l1-to-l2": "L1 -> L2",
   "mappings": "Mappings",
   "storage": "Storage",
   "visibility": "Visibility"
