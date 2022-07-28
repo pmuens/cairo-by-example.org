@@ -6,6 +6,7 @@
   "events": "Events",
   "hello-world": "Hello World",
   "l1-to-l2": "L1 -> L2",
+  "l2-to-l1": "L2 -> L1",
   "mappings": "Mappings",
   "storage": "Storage",
   "visibility": "Visibility"
