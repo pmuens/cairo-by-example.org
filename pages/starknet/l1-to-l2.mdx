@@ -6,7 +6,7 @@ Functions annotated with the `@l1_handler` can be called from the "StarkNet Core
 
 A StarkNet contract can have multiple functions annotated with `@l1_handler`. A selector which is a number that uniquely identifies the function name will be used to distinguish between different `@l1_handler`s.
 
-The arguments received by the function annotated with `@l1_handler` are the L1 contract address that sent the message, followed by the message elements in the order they were sent.
+The arguments received by the function annotated with `@l1_handler` are the L1 contract address that sent the message followed by the message elements in the order they were sent.
 
 When calling `sendMessageToL2` on the StarkNet Core Contract on L1, one needs to supply the L2 contract address, the function selector and the payload encoded as an array.
 
@@ -68,7 +68,7 @@ Running the script produces the following output:
 1516919092654529690972514611118255134945769636354332808776333403020481942377
 ```
 
-Next up we can write a Solidity Smart Contract that we'll deploy on L1. This contract uses the StarkNet Core Contract to send our message via `sendMessageToL2` from L1 to L2.
+Next up we can write a Solidity Smart Contract that we'll deploy on L1. This contract uses the StarkNet Core Contract to send our message via `sendMessageToL2` from L1 to L2:
 
 ```solidity
 // SPDX-License-Identifier: GPL-3.0
