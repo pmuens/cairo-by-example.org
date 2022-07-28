@@ -70,6 +70,8 @@ contract L2ToL1 {
         uint256 a,
         uint256 b
     ) external {
+        // Note: It might be useful to check for whitelisted L2 contracts here.
+
         // Our payload is two numbers: `a` and `b`.
         uint256 payloadSize = 2;
 
