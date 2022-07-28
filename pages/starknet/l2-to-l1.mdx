@@ -1,0 +1,100 @@
+# L2 to L1 Communication
+
+StarkNet contracts can send messages to L1.
+
+Messages can be sent via the `send_message_to_l1` utility function. The arguments required by this function are the L1 contract address that should receive the message followed by the payload size and the payload.
+
+Messages can be received on L1 by calling the `consumeMessageFromL2` function on the StarkNet Core Contract which receives the L2 contract address and the payload as arguments.
+
+Trying to send invalid messages on L2 will cause the transaction to fail. The same is true when trying to read invalid messages on L1.
+
+## Example
+
+The following is a StarkNet contract that sends the two numbers `a` and `b` to L1 via `send_message_to_l1`:
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.alloc import alloc
+from starkware.starknet.common.messages import send_message_to_l1
+
+@external
+func send_message{syscall_ptr : felt*}(l1_contract_address : felt, a : felt, b : felt):
+    # The Smart Contract address on L1 we want to send the message to.
+    let to_address = l1_contract_address
+
+    # Our payload will be two numbers: `a` and `b`.
+    let payload_size = 2
+
+    # Create the payload as an array of length 2
+    #   and add the two numbers to the array slots.
+    let (payload : felt*) = alloc()
+    assert payload[0] = a
+    assert payload[1] = b
+
+    # Use the `send_message_to_l1` functionality to send the message
+    #   to the Smart Contract on L1.
+    send_message_to_l1(to_address, payload_size, payload)
+
+    return ()
+end
+```
+
+Next up we can write a Solidity Smart Contract that we'll deploy on L1. This contract uses the StarkNet Core Contract to read our message sent from L2 to L1 via `consumeMessageFromL2`:
+
+```solidity
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
+
+// Interface definition so that we can use the StarkNet Core Contract.
+interface IStarknetCore {
+    function consumeMessageFromL2(
+        uint256 fromAddress,
+        uint256[] calldata payload
+    ) external returns (bytes32);
+}
+
+contract L2ToL1 {
+    IStarknetCore starknetCore;
+
+    // We use this storage variable so that we can inspect
+    //  the sum later on.
+    uint256 public sum;
+
+    constructor(IStarknetCore starknetCore_) {
+        starknetCore = starknetCore_;
+    }
+
+    function add(
+        uint256 l2ContractAddress,
+        uint256 a,
+        uint256 b
+    ) external {
+        // Our payload is two numbers: `a` and `b`.
+        uint256 payloadSize = 2;
+
+        // Create the payload as an in-memory array of length 2
+        //  and add the two numbers to the array slots.
+        uint256[] memory payload = new uint256[](payloadSize);
+        payload[0] = a;
+        payload[1] = b;
+
+        // This call reverts if the message doesn't exist on L1.
+        starknetCore.consumeMessageFromL2(l2ContractAddress, payload);
+
+        // If we got to this point everything is ok and we can compute
+        //  the sum and store it in the storage variable.
+        sum = a + b;
+    }
+}
+```
+
+## Addresses
+
+### StarkNet Core Contract - Mainnet Alpha
+
+[0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4](https://etherscan.io/address/0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4)
+
+### StarkNet Core Contract - Goerli Alpha
+
+[0xde29d060D45901Fb19ED6C6e959EB22d8626708e](https://goerli.etherscan.io/address/0xde29d060D45901Fb19ED6C6e959EB22d8626708e)
