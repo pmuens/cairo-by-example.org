@@ -1,0 +1,19 @@
+# Caller Address
+
+The address that calls the contract function can be obtained via the `get_caller_address` utility function.
+
+## Example
+
+```cairo
+%lang starknet
+
+# Import the `get_caller_address` utility function.
+from starkware.starknet.common.syscalls import get_caller_address
+
+@view
+func get_current_caller_address{syscall_ptr : felt*}() -> (address : felt):
+    # `get_caller_address` returns the address that's calling the contract's function.
+    let (address) = get_caller_address()
+    return (address)
+end
+```
