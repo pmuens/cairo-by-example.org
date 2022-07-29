@@ -1,0 +1,19 @@
+# Contract Address
+
+The contract address can be obtained via the `get_contract_address` utility function.
+
+## Example
+
+```cairo
+%lang starknet
+
+# Import the `get_contract_address` utility function.
+from starkware.starknet.common.syscalls import get_contract_address
+
+@view
+func get_current_contract_address{syscall_ptr : felt*}() -> (address : felt):
+    # `get_contract_address` returns the contract's address.
+    let (address) = get_contract_address()
+    return (address)
+end
+```
