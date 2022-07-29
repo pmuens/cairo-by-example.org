@@ -3,6 +3,7 @@
   "block-information": "Block Information",
   "caller-address": "Caller Address",
   "constructor": "Constructor",
+  "contract-address": "Contract Address",
   "contract-calls": "Contract Calls",
   "events": "Events",
   "hello-world": "Hello World",
