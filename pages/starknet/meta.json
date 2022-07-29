@@ -1,6 +1,7 @@
 {
   "authentication": "Authentication",
   "block-information": "Block Information",
+  "caller-address": "Caller Address",
   "constructor": "Constructor",
   "contract-calls": "Contract Calls",
   "events": "Events",
