@@ -1,0 +1,121 @@
+# Generating Proofs
+
+The SHARP (Shared Prover) Service allows for the generation of proofs that attest to the validity of Cairo program executions.
+
+Cairo programs that are executed by the SHARP Service need to produce outputs.
+
+Proofs are verified by a Smart Contract on Ethereum.
+
+## Example
+
+The following is a Cairo program that checks if the numbers passed-in as inputs are the prime factors of the prime number 15.
+
+```cairo
+# The program produces outputs which require the `output` builtin.
+%builtins output
+
+from starkware.cairo.common.serialize import serialize_word
+
+func main{output_ptr : felt*}():
+    alloc_locals
+
+    local prime_1
+    local prime_2
+    let expected = 15
+
+    # Read the Prime factors from the input and store them in local variables.
+    %{
+        ids.prime_1 = program_input["prime_1"]
+        ids.prime_2 = program_input["prime_2"]
+    %}
+
+    # Compute the potential Prime number.
+    let result = prime_1 * prime_2
+
+    # Throw an error if the Prime factors are invalid.
+    assert result = expected
+
+    # Output Prime factors and Prime number.
+    serialize_word(prime_1)
+    serialize_word(prime_2)
+    serialize_word(expected)
+
+    return ()
+end
+```
+
+An `input.json` file for the program might look like this:
+
+```json
+{
+  "prime_1": 3,
+  "prime_2": 5
+}
+```
+
+The program can be compiled and sent off to the SHARP Service with the following command:
+
+```sh
+cairo-sharp submit --source sharp.cairo --program_input input.json
+```
+
+The output generated includes the Job key which is a unique identifier created and assigned by the SHARP Service as well as the the Fact which is the result of hashing the program hash and the hash of the output.
+
+```sh
+Compiling...
+Running...
+Submitting to SHARP...
+Job sent.
+Job key: 73500390-65dc-446d-a29a-9a09348998d4
+Fact: 0x0fb87734675291a4cb80db62ca1d66472bfd157a4d24b985bec72e577244a545
+```
+
+The status of the Job can be obtained via the Job key and the following command:
+
+```sh
+cairo-sharp status 73500390-65dc-446d-a29a-9a09348998d4
+```
+
+Once the status query reports `PROCESSED` the Fact can be verified (note that the Fact identifier is used, not the Job key):
+
+```sh
+cairo-sharp is_verified 0x0fb87734675291a4cb80db62ca1d66472bfd157a4d24b985bec72e577244a545 --node_url https://rpc.ankr.com/eth_goerli
+```
+
+The Fact identifier can also be derived programmatically:
+
+```python
+from web3 import Web3
+
+
+def main():
+    # Program Hash is the Pedersen Hash of the compiled program.
+    # Can be obtained via the [Cairo Playground](https://www.cairo-lang.org/playground) as
+    #   it's output when clicking the "Run" button.
+    # Note: The Program Hash does not depend on the input provided.
+    program_hash = 0x06F8F5FA88CC63195A6CC0063AF3579CD8F11C3725DD8B2B0D76B8127B0A401C
+    program_output = [3, 5, 15]
+
+    fact = Web3.solidityKeccak(
+        ["uint256", "bytes32"],
+        [program_hash, Web3.solidityKeccak(["uint256[]"], [program_output])],
+    )
+
+    print(fact.hex())
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Running this script returns the same Fact identifier like the execution of `cairo-sharp submit` above:
+
+```sh
+0x0fb87734675291a4cb80db62ca1d66472bfd157a4d24b985bec72e577244a545
+```
+
+## Addresses
+
+### Fact Registry Contract - Goerli Alpha
+
+[0xAB43bA48c9edF4C2C4bB01237348D1D7B28ef168](https://goerli.etherscan.io/address/0xAB43bA48c9edF4C2C4bB01237348D1D7B28ef168)
