@@ -1,0 +1,72 @@
+# Library Calls
+
+Library Calls allow for the execution of any contract class function within the context of the calling contract.
+
+Storage-changing operations will change the state of the calling contract. State of the called contract won't be changed as calls are made to its class rather than its instance. Storage will always be persistet. Even if the calling contract doesn't define it explicitly via `@storage_var`.
+
+Calls to `get_caller_address()` and `get_contract_address()` will return the same values they would return when called from the calling function.
+
+A Library Call requires:
+
+1. An interface definition of the contract class to be called
+2. The called function to be prefixed with `library_call_`
+3. The class hash to be passed-into the called function as the first argument
+
+## Example
+
+The `MathContract` contract that we want to call the `add` function on:
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+@storage_var
+func result() -> (result : felt):
+end
+
+@view
+func add{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(a : felt, b : felt):
+    result.write(a + b)
+    return ()
+end
+```
+
+We can run `starknet declare` to get the contract class hash:
+
+```sh
+starknet declare --contract math_contract_compiled.json
+```
+
+We can use a Library Call to invoke the `MathContract`'s `add` function while persisting the result in the following contract:
+
+```cairo
+%lang starknet
+
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+# The `@contract_interface` decorator turns this `namespace` into an
+#   interface we can consume.
+@contract_interface
+namespace IMathContract:
+    func add(a : felt, b : felt) -> (result : felt):
+    end
+end
+
+# A contract storage variable to store the result of a math operation.
+@storage_var
+func result() -> (result : felt):
+end
+
+@external
+func sum{syscall_ptr : felt*, range_check_ptr}(class_hash : felt, a : felt, b : felt):
+    # Library calls have to be prefixed with `library_call_` and get the
+    #   `class_hash` as their first argument.
+    # This function call will change state but given that it's a
+    #   library call it'll update the state of the calling contract
+    #   (this contract), not the state of the called contract (`MathContract`).
+    IMathContract.library_call_add(class_hash=class_hash, a=a, b=b)
+
+    return ()
+end
+```
