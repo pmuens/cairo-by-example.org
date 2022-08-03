@@ -2,6 +2,8 @@
 
 Cairo supports the condition statements `if` and `if ... else`. `else if` statements are currently not supported.
 
+Conditions can be combined with the `and` operator.
+
 In addition to the regular conditional statement one can also use the "Multiplication Trick" to create an inline-if condition statement (conditional ternary operator).
 
 ## Example
@@ -11,10 +13,19 @@ In addition to the regular conditional statement one can also use the "Multiplic
 from starkware.cairo.common.bool import TRUE, FALSE
 
 func main():
-    tempvar result
+    alloc_locals
+
+    local result
 
     # `if` statement.
     if 1 == 0:
+        result = FALSE
+    end
+
+    assert result = TRUE
+
+    # `if` statement with `and`.
+    if 1 == 0 and 0 == 1:
         result = FALSE
     end
 
