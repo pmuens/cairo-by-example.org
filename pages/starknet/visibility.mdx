@@ -10,18 +10,15 @@ Smart Contract functions can have 3 levels of visibility:
     - `@external` decorator
     - Queries state and might modify it
     - Can be called by StarkNet users and other contracts
-    - Can only have `felt` arguments
 2.  View
     - `@view` decorator
     - Only queries state and doesn't modify it
     - Can be called by StarkNet users and other contracts
     - Only semantic meaning as it's not enforced by the compiler at the moment
-    - Can only have `felt` arguments
 3.  Internal / Private
     - No decorator
     - Might query and / or modify state
     - Not accessible from the outside
-    - Can have any argument type
 
 ## Example
 
