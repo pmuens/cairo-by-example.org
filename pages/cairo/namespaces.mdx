@@ -1,0 +1,32 @@
+# Namespaces
+
+Namespaces allow for the grouping and encapsulation of related functionality.
+
+Namespaces are defined with the `namespace` keyword. Members of the namespace can be accessed via the dot syntax (e.g. `foo.bar`).
+
+## Example
+
+```cairo
+# A `namespace` called `math`.
+namespace math:
+    func add(a : felt, b : felt) -> (result : felt):
+        return (a + b)
+    end
+
+    func multiply(a : felt, b : felt) -> (result : felt):
+        return (a * b)
+    end
+end
+
+func main():
+    # Namespace members are accessed via the dot syntax.
+    let (result) = math.add(1, 2)
+    assert result = 3
+
+    # Calling the `multiply` function in the `math` namespace.
+    let (result) = math.multiply(1, 2)
+    assert result = 2
+
+    return ()
+end
+```
