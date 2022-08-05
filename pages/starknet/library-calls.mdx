@@ -16,7 +16,7 @@ A Library Call requires:
 
 The `MathContract` contract that we want to call the `add` function on:
 
-```cairo
+```
 %lang starknet
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
@@ -40,7 +40,7 @@ starknet declare --contract math_contract_compiled.json
 
 We can use a Library Call to invoke the `MathContract`'s `add` function while persisting the result in the following contract:
 
-```cairo
+```
 %lang starknet
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
