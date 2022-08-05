@@ -12,5 +12,6 @@
   "library-calls": "Library Calls",
   "mappings": "Mappings",
   "storage": "Storage",
+  "transaction-information": "Transaction Information",
   "visibility": "Visibility"
 }
