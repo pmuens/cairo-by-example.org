@@ -13,17 +13,17 @@
   "author": "Philipp Muens",
   "license": "MIT",
   "dependencies": {
-    "next": "^12.1.0",
-    "nextra": "^2.0.0-beta.5",
-    "nextra-theme-docs": "^2.0.0-beta.5",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "next": "^12.2.4",
+    "nextra": "^2.0.0-beta.14",
+    "nextra-theme-docs": "^2.0.0-beta.14",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "eslint": "^8.19.0",
-    "eslint-config-next": "^12.2.2",
+    "eslint": "^8.21.0",
+    "eslint-config-next": "^12.2.4",
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.7.1",
-    "vercel": "^27.0.1"
+    "vercel": "^27.3.7"
   }
 }
