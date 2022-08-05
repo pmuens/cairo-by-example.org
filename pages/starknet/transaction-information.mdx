@@ -1,0 +1,29 @@
+# Transaction Information
+
+Transaction information can be obtained via the `get_tx_info` utility function that returns a pointer to the [`TxInfo`](https://github.com/starkware-libs/cairo-lang/blob/13cef109cd811474de114925ee61fd5ac84a25eb/src/starkware/starknet/common/syscalls.cairo#L393-L416) struct.
+
+The [`TxInfo`](https://github.com/starkware-libs/cairo-lang/blob/13cef109cd811474de114925ee61fd5ac84a25eb/src/starkware/starknet/common/syscalls.cairo#L393-L416) struct has the following members:
+
+- `version`
+- `account_contract_address`
+- `max_fee`
+- `signature_len`
+- `signature`
+- `transaction_hash`
+- `chain_id`
+
+## Example
+
+```
+%lang starknet
+
+# Import the `get_tx_info` utility function.
+from starkware.starknet.common.syscalls import get_tx_info
+
+@view
+func get_account_contract_address{syscall_ptr : felt*}() -> (address : felt):
+    let (info) = get_tx_info()
+    # Access the `account_contract_address` field on the `TxInfo` struct.
+    return (address=info.account_contract_address)
+end
+```
